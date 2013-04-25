@@ -50,6 +50,8 @@ public class Main extends Application {
         primaryStage.setTitle("VMarkdown Demo!");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        controller.setWindow(primaryStage);
      
     }
 

@@ -28,31 +28,16 @@
       <menus>
         <Menu mnemonicParsing="false" text="File">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#onLoadAction" text="Open">
-              <accelerator>
-                <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-              </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#onSaveAction" text="Save">
-              <accelerator>
-                <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-              </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#onExportHtmlAction" text="Export HTML">
-              <accelerator>
-                <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-              </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#onCloseAction" text="Close">
-              <accelerator>
-                <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-              </accelerator>
-            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#onLoadAction" text="Open" fx:id="loadItem" />
+            <MenuItem mnemonicParsing="false" onAction="#onSaveAction" text="Save" fx:id="saveItem" />
+            <MenuItem mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As" fx:id="saveAsItem" />
+            <MenuItem mnemonicParsing="false" onAction="#onExportHtmlAction" text="Export HTML" fx:id="exportItem" />
+            <MenuItem mnemonicParsing="false" onAction="#onCloseAction" text="Close" fx:id="closeItem" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Edit">
+        <Menu mnemonicParsing="false" text="Insert">
           <items>
-            <MenuItem mnemonicParsing="false" text="Delete" />
+            <MenuItem mnemonicParsing="false" onAction="#onInsertImageAction" text="Insert Image" fx:id="insertImageItem" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
