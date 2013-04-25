@@ -1,0 +1,59 @@
+apply from: 'http://dl.bintray.com/content/shemnon/javafx-gradle/javafx.plugin'
+
+repositories {
+    mavenCentral()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.5'
+}
+
+String javaVersion = System.getProperty("java.version")
+
+int jdk = 7;
+
+if (javaVersion.startsWith("1.7")) {
+    jdk=7;
+} else if (javaVersion.startsWith("1.8")) {
+    jdk=8;
+} else {
+    System.err.println("Unsupported JDK: " + javaVersion);
+}
+    
+println(">> using jdk " + javaVersion)
+
+
+dependencies {
+    compile project(":VMultiMarkdown")
+}
+
+subprojects {
+    // we want to skip task run for all subprojects
+    task run  {println "skipping task run for: " + project }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/']
+        }
+        
+        resources {
+            srcDirs = ['src/']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['test/']
+        }
+    }
+}
+
+javafx {
+    mainClass "eu.mihosoft.vrl.mmd.editor.Main"
+}
+
+jfxDeploy {
+    packaging = "image"
+}

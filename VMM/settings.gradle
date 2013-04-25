@@ -1,0 +1,2 @@
+include "VMultiMarkdown"
+project(":VMultiMarkdown").projectDir = new File(settingsDir, "../VMultiMarkdown")
