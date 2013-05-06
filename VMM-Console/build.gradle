@@ -1,0 +1,41 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.5'
+}
+  
+dependencies {
+  compile project("VMultiMarkdown")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/']
+        }
+        
+        resources {
+            srcDirs = ['src/']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['test/']
+        }
+    }
+}
+
+project.ext.set("mainClass", "eu.mihosoft.vrl.mmd.VMMConsole")
+
+jar {
+    manifest {
+        attributes("Main-Class": "eu.mihosoft.vrl.mmd.VMMConsole")
+    }
+}
+
+
