@@ -147,6 +147,28 @@ public class MultiMarkdown {
     }
 
     /**
+     * Converts the specified markdown files to HTML. The result will be written
+     * to the same folder where the input files are located.
+     * 
+     * @param input input files to convert 
+     * @throws FileNotFoundException 
+     */
+    public static void convert(File[] input) throws FileNotFoundException {
+        for (File i : input) {
+
+            String oName = i.getName();
+
+            if (oName.toLowerCase().endsWith(".md")) {
+                oName = oName.substring(0,oName.length() - 3) + ".html";
+            }
+
+            File o = new File(i.getAbsoluteFile().getParentFile(), oName);
+
+            convert(i, o, Format.html);
+        } // end for each input file
+    }
+
+    /**
      * Converts the specified format to the appropriate argument string.
      *
      * @param format format to convert
@@ -183,7 +205,7 @@ public class MultiMarkdown {
             try {
                 multiMarkdownProcess = Runtime.getRuntime().exec(cmd);
                 multiMarkdownProcess.waitFor();
-            } catch (    IOException | InterruptedException ex) {
+            } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(MultiMarkdown.class.getName()).
                         log(Level.SEVERE, null, ex);
             }
@@ -231,10 +253,10 @@ public class MultiMarkdown {
                         "/eu/mihosoft/vrl/mmd/resources/"
                         + VSysUtil.getSystemBinaryPath()
                         + "multimarkdown";
-                
+
                 if (VSysUtil.isWindows()) {
-					resourceName+=".exe";
-				}
+                    resourceName += ".exe";
+                }
 
                 IOUtil.saveStreamToFile(
                         MultiMarkdown.class.getResourceAsStream(resourceName),
@@ -275,4 +297,3 @@ public class MultiMarkdown {
         return tmpFile.getAbsolutePath();
     }
 }
-
