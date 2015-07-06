@@ -17,7 +17,7 @@ install:
     - TERM=dumb ./gradlew clean
 
 script:
-    - TERM=dumb ./gradlew test
+    - TERM=dumb ./gradlew test && ./gradlew assemble
 
 
 ##after_success:
