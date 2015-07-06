@@ -1,29 +1,41 @@
-apply from: 'http://dl.bintray.com/content/shemnon/javafx-gradle/javafx.plugin'
+apply from: 'gradle/plugins/javafx.plugin'
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
+        
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.5'
+    gradleVersion = '2.4'
 }
 
-String javaVersion = System.getProperty("java.version")
 
-int jdk = 7;
+def loadProperties(String sourceFileName) {
 
-if (javaVersion.startsWith("1.7")) {
-    jdk=7;
-} else if (javaVersion.startsWith("1.8")) {
-    jdk=8;
-} else {
-    System.err.println("Unsupported JDK: " + javaVersion);
+    def config = new Properties()
+    def propFile = new File(projectDir,sourceFileName)
+
+    if (propFile.isFile()) {
+        config.load(new FileInputStream(propFile))
+        for (Map.Entry property in config) {
+            ext.set(property.key, property.value)
+        }
+    }
 }
-    
-println(">> using jdk " + javaVersion)
-
-
+// loads the property file
+loadProperties('build.properties')
+  
 dependencies {
+    compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.3.0.1-SNAPSHOT')
+    compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.3.0.1-SNAPSHOT', classifier: 'sources')
+    compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.3.0.1-SNAPSHOT', classifier: 'javadoc')
+
     compile project(":VMultiMarkdown")
 }
 
@@ -32,23 +44,6 @@ subprojects {
     task run  {println "skipping task run for: " + project }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/']
-        }
-        
-        resources {
-            srcDirs = ['src/']
-        }
-    }
-
-    test {
-        java {
-            srcDirs = ['test/']
-        }
-    }
-}
 
 javafx {
     mainClass "eu.mihosoft.vrl.mmd.editor.Main"
@@ -56,4 +51,30 @@ javafx {
 
 jfxDeploy {
     packaging = "image"
+}
+
+// create a fat-jar (class files plus dependencies
+// excludes VRL.jar (plugin jar files must not start with 'vrl-\\d+')
+jar {
+
+    // dependencies except VRL
+    from configurations.runtime.asFileTree.
+        filter({file->return !file.name.startsWith("vrl-0")}).
+        filter({file->return !file.name.startsWith("VRL.jar")}).
+        files.collect { zipTree(it) }
+
+    // project class files compiled from source
+    from files(sourceSets.main.output)
+}
+
+
+
+// compiles and installs the vrl plugin to the specified folder
+task installVRLPlugin(dependsOn: [clean,jar]) << {
+    println(">> copying vrl plugin to: " + vrldir+"/plugin-updates")
+    copy {
+        from buildDir.getPath()+"/libs/"+rootProject.name + ".jar"
+        into vrldir+"/plugin-updates"
+        include '**/*.jar'
+    }
 }
