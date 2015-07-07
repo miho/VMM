@@ -75,7 +75,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private MenuItem insertImageItem;
 
-    private double prevScrollLoc = 0;
+    private int prevScrollLoc = 0;
     private boolean scrollEventHadAnEffect;
 
     /**
@@ -125,27 +125,9 @@ public class MainWindowController implements Initializable {
         outputView.getEngine().getLoadWorker().stateProperty().
                 addListener((ov, oldV, newV) -> {
                     if (newV == State.SUCCEEDED) {
-                        setVScrollBarLocation(outputView, prevScrollLoc);
+                        scrollTo(outputView, 0, prevScrollLoc);
                     }
                 });
-
-//        outputView.setOnScrollStarted((evt) -> {
-//            prevScrollLoc = 0;
-//        });
-        ScrollBar sb = getScrollBar(outputView);
-
-//        if (sb != null) {
-//            sb.valueProperty().addListener((ov, oldV, newV) -> {
-//                scrollEventHadAnEffect = true;
-//            });
-//        }
-        outputView.setOnScroll((evt) -> {
-
-            if (sb.getValue() > sb.getMin() + 50
-                    && sb.getValue() < sb.getMax() - 50) {
-                prevScrollLoc += evt.getDeltaY();
-            }
-        });
 
     }
 
@@ -185,6 +167,7 @@ public class MainWindowController implements Initializable {
                 MultiMarkdown.convert(currentDocument, outputDocument, Format.html);
 
                 try {
+                    prevScrollLoc = getVScrollValue(outputView);
                     outputView.getEngine().load(outputDocument.toURI().toURL().toExternalForm());
 
                 } catch (MalformedURLException ex) {
@@ -197,79 +180,59 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    private ScrollBar getScrollBar(WebView webView) {
-
-        Set<Node> scrolls = webView.lookupAll(".scroll-bar");
-        for (Node scrollNode : scrolls) {
-
-            if (ScrollBar.class.isInstance(scrollNode)) {
-                ScrollBar scroll = (ScrollBar) scrollNode;
-                return scroll;
-            }
-        }
-        return null;
+    /**
+     * Scrolls to the specified position.
+     *
+     * @param view web view that shall be scrolled
+     * @param x horizontal scroll value
+     * @param y vertical scroll value
+     */
+    public void scrollTo(WebView view, int x, int y) {
+        view.getEngine().executeScript("window.scrollTo(" + x + ", " + y + ")");
     }
 
-    private double getScrollBarLocation(WebView webView) {
-
-        Set<Node> scrolls = webView.lookupAll(".scroll-bar");
-        for (Node scrollNode : scrolls) {
-
-            if (ScrollBar.class.isInstance(scrollNode)) {
-                ScrollBar scroll = (ScrollBar) scrollNode;
-                return scroll.getValue();
-            }
-        }
-
-        return -1;
+    /**
+     * Returns the vertical scroll value, i.e. thumb position. This is
+     * equivalent to {@link javafx.scene.control.ScrollBar#getValue().
+     *
+     * @param view
+     * @return vertical scroll value
+     */
+    public int getVScrollValue(WebView view) {
+        return (Integer) view.getEngine().executeScript("document.body.scrollTop");
     }
 
-    private double getScrollBarLocationMin(WebView webView) {
-
-        Set<Node> scrolls = webView.lookupAll(".scroll-bar");
-        for (Node scrollNode : scrolls) {
-
-            if (ScrollBar.class.isInstance(scrollNode)) {
-                ScrollBar scroll = (ScrollBar) scrollNode;
-                return scroll.getMin();
-            }
-        }
-
-        return -1;
+    /**
+     * Returns the horizontal scroll value, i.e. thumb position. This is
+     * equivalent to {@link javafx.scene.control.ScrollBar#getValue()}.
+     *
+     * @param view
+     * @return horizontal scroll value
+     */
+    public int getHScrollValue(WebView view) {
+        return (Integer) view.getEngine().executeScript("document.body.scrollLeft");
     }
 
-    private double getScrollBarLocationMax(WebView webView) {
-
-        Set<Node> scrolls = webView.lookupAll(".scroll-bar");
-        for (Node scrollNode : scrolls) {
-
-            if (ScrollBar.class.isInstance(scrollNode)) {
-                ScrollBar scroll = (ScrollBar) scrollNode;
-                return scroll.getMax();
-            }
-        }
-
-        return -1;
+    /**
+     * Returns the maximum vertical scroll value. This is equivalent to
+     * {@link javafx.scene.control.ScrollBar#getMax()}.
+     *
+     * @param view
+     * @return vertical scroll max
+     */
+    public int getVScrollMax(WebView view) {
+        return (Integer) view.getEngine().executeScript("document.body.scrollWidth");
     }
 
-    private void setVScrollBarLocation(WebView webView, double loc) {
-
-//        System.out.println("-- set: " + loc);
-//
-//        Set<Node> scrolls = webView.lookupAll(".scroll-bar");
-//        for (Node scrollNode : scrolls) {
-//
-//            if (ScrollBar.class.isInstance(scrollNode)) {
-//                System.out.println("---- new: " + scrollNode);
-//                ScrollBar scroll = (ScrollBar) scrollNode;
-//                if (scroll.getOrientation() == Orientation.VERTICAL) {
-//                    System.out.println("set-val: " + loc + ", get-val: " + scroll.getValue() + ", max: " + scroll.getMax());
-//
-//                    scroll.setValue(loc);
-//                }
-//            }
-//        }
-        sendScrollEvent(webView.getScene(), webView, 0, loc);
+    /**
+     * Returns the maximum horizontal scroll value. This is equivalent to
+     * {@link javafx.scene.control.ScrollBar#getMax()}.
+     *
+     * @param view
+     * @return horizontal scroll max
+     */
+    public int getHScrollMax(WebView view) {
+        return (Integer) view.getEngine().executeScript("document.body.scrollHeight");
     }
 
     private void exportAsHTML() {
@@ -457,6 +420,8 @@ public class MainWindowController implements Initializable {
             for (String l : lines) {
                 document += l + "\n";
             }
+            
+            prevScrollLoc = 0;
 
             editor.setText(document);
 
@@ -466,11 +431,6 @@ public class MainWindowController implements Initializable {
             Logger.getLogger(MainWindowController.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
-    }
-
-    @FXML
-    public void onTestAction(ActionEvent e) {
-        setVScrollBarLocation(outputView, 2000);
     }
 
     /**

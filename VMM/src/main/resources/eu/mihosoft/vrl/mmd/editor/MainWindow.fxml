@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import java.util.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
 <?import javafx.scene.web.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="763.9999000000025" prefWidth="1104.0001220703125" xmlns:fx="http://javafx.com/fxml" fx:controller="eu.mihosoft.vrl.mmd.editor.MainWindowController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="763.9999000000025" prefWidth="1104.0001220703125" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.mihosoft.vrl.mmd.editor.MainWindowController">
   <children>
     <SplitPane dividerPositions="0.46460974889740725" focusTraversable="true" prefHeight="763.9999000000025" prefWidth="1104.0001220703125" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
       <items>
@@ -19,7 +16,7 @@
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
           <children>
-            <WebView fx:id="outputView" prefHeight="737.0" prefWidth="588.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <WebView fx:id="outputView" prefHeight="100.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
           </children>
         </AnchorPane>
       </items>
@@ -28,16 +25,16 @@
       <menus>
         <Menu mnemonicParsing="false" text="File">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#onLoadAction" text="Open" fx:id="loadItem" />
-            <MenuItem mnemonicParsing="false" onAction="#onSaveAction" text="Save" fx:id="saveItem" />
-            <MenuItem mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As" fx:id="saveAsItem" />
-            <MenuItem mnemonicParsing="false" onAction="#onExportHtmlAction" text="Export HTML" fx:id="exportItem" />
-            <MenuItem mnemonicParsing="false" onAction="#onCloseAction" text="Close" fx:id="closeItem" />
+            <MenuItem fx:id="loadItem" mnemonicParsing="false" onAction="#onLoadAction" text="Open" />
+            <MenuItem fx:id="saveItem" mnemonicParsing="false" onAction="#onSaveAction" text="Save" />
+            <MenuItem fx:id="saveAsItem" mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As" />
+            <MenuItem fx:id="exportItem" mnemonicParsing="false" onAction="#onExportHtmlAction" text="Export HTML" />
+            <MenuItem fx:id="closeItem" mnemonicParsing="false" onAction="#onCloseAction" text="Close" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Insert">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#onInsertImageAction" text="Insert Image" fx:id="insertImageItem" />
+            <MenuItem fx:id="insertImageItem" mnemonicParsing="false" onAction="#onInsertImageAction" text="Insert Image" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
