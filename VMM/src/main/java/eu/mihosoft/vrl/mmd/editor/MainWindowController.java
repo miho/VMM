@@ -77,6 +77,8 @@ public class MainWindowController implements Initializable {
 
     private int prevScrollLoc = 0;
     private boolean scrollEventHadAnEffect;
+    
+    private StringHandler stringHandler;
 
     /**
      * Initializes the controller class.
@@ -128,29 +130,30 @@ public class MainWindowController implements Initializable {
                         scrollTo(outputView, 0, prevScrollLoc);
                     }
                 });
+        
+        
+        stringHandler = new StringHandler();
+
+        URL.setURLStreamHandlerFactory(protocol -> {
+            if (protocol.equals("string")) {
+                return stringHandler;
+            } else {
+                return null;
+            }
+        });
 
     }
 
     @FXML
     public void onKeyTyped(KeyEvent evt) {
-//        String output = editor.getText();
-//
-//        output = MultiMarkdown.convert(output);
-//
-//        System.out.println(output);
-//
-//        
-//
-//        URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
-//
-//            @Override
-//            public URLStreamHandler createURLStreamHandler(String protocol) {
-//                
-//            }
-//        });
-//        
-//        
-//        outputView.getEngine().s
+        String output = editor.getText();
+
+        output = MultiMarkdown.convert(output);
+        
+        stringHandler.setContentRoot(currentDocument.getParentFile());
+        stringHandler.setContent(output);
+
+        outputView.getEngine().load("string:content");
     }
 
     private void updateMarkdown() {
@@ -420,7 +423,7 @@ public class MainWindowController implements Initializable {
             for (String l : lines) {
                 document += l + "\n";
             }
-            
+
             prevScrollLoc = 0;
 
             editor.setText(document);
