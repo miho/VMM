@@ -1,4 +1,6 @@
-apply from: 'gradle/plugins/javafx.plugin'
+//apply from: 'gradle/plugins/javafx.plugin'
+
+apply plugin: 'java'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -47,18 +49,9 @@ subprojects {
 }
 
 
-javafx {
-    mainClass "eu.mihosoft.vrl.mmd.editor.Main"
-}
-
-jfxDeploy {
-    packaging = "image"
-}
-
 // create a fat-jar (class files plus dependencies
 // excludes VRL.jar (plugin jar files must not start with 'vrl-\\d+')
 jar {
-
     // dependencies except VRL
     from configurations.runtime.asFileTree.
         filter({file->return !file.name.startsWith("vrl-0")}).
@@ -66,7 +59,8 @@ jar {
         files.collect { zipTree(it) }
 
     // project class files compiled from source
-    from files(sourceSets.main.output)
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
 }
 
 
