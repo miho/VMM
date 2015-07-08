@@ -13,24 +13,6 @@ dependencies {
 
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/']
-        }
-        
-        resources {
-            srcDirs = ['src/']
-        }
-    }
-
-    test {
-        java {
-            srcDirs = ['test/']
-        }
-    }
-}
-
 project.ext.set("mainClass", "eu.mihosoft.vrl.mmd.MultiMarkdown")
 
 jar {
