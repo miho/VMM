@@ -7,6 +7,7 @@ package eu.mihosoft.vrl.mmd.editor;
 import com.sun.javafx.geom.PickRay;
 import com.sun.javafx.scene.input.PickResultChooser;
 import eu.mihosoft.vrl.mmd.Format;
+import eu.mihosoft.vrl.mmd.IOUtil;
 import eu.mihosoft.vrl.mmd.MultiMarkdown;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,12 +77,13 @@ public class MainWindowController implements Initializable {
     private MenuItem insertImageItem;
 
     private int prevScrollLoc = 0;
-    private boolean scrollEventHadAnEffect;
-    
-    private StringHandler stringHandler;
+
+    private RewriteDocumentLocationHandler rewriteDocumentLocationHandler;
 
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -131,29 +133,71 @@ public class MainWindowController implements Initializable {
                     }
                 });
         
-        
-        stringHandler = new StringHandler();
+        outputView.setOnScrollFinished((evt)->{
+            prevScrollLoc = getVScrollValue(outputView);
+        });
+
+        rewriteDocumentLocationHandler = new RewriteDocumentLocationHandler();
 
         URL.setURLStreamHandlerFactory(protocol -> {
-            if (protocol.equals("string")) {
-                return stringHandler;
+            if (protocol.equals("file")) {
+                return rewriteDocumentLocationHandler;
             } else {
                 return null;
             }
         });
+    }
 
+    private String replaceEndingOfFileNameFromMDToHTML(String fileName) {
+        if (fileName.endsWith(".md")) {
+            fileName = "." + fileName.substring(0, fileName.length() - 3) + ".html";
+        }
+
+        return fileName;
+    }
+
+    private void saveTmpDocumentTo(File dstFile) {
+        try (FileWriter fileWriter = new FileWriter(dstFile)) {
+            fileWriter.write(editor.getText());
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindowController.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
     public void onKeyTyped(KeyEvent evt) {
-        String output = editor.getText();
 
-        output = MultiMarkdown.convert(output);
-        
-        stringHandler.setContentRoot(currentDocument.getParentFile());
-        stringHandler.setContent(output);
+        try {
+            String output = editor.getText();
 
-        outputView.getEngine().load("string:content");
+            String outputFilename
+                    = replaceEndingOfFileNameFromMDToHTML(currentDocument.getName());
+
+            File outputDocument = new File(currentDocument.getAbsoluteFile().getParent(), outputFilename);
+
+            File contentTmpLocation = IOUtil.createTempDir();
+            File tmpOutputDocumentMD = new File(contentTmpLocation, "content.md");
+            File tmpOutputDocumentHTML = new File(contentTmpLocation, "content.html");
+            
+            saveTmpDocumentTo(tmpOutputDocumentMD);
+
+            try {
+                MultiMarkdown.convert(tmpOutputDocumentMD, tmpOutputDocumentHTML, Format.html);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(MainWindowController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            rewriteDocumentLocationHandler.setDocumentFile(outputDocument);
+            rewriteDocumentLocationHandler.setTmpContentFile(tmpOutputDocumentHTML);
+
+            outputView.getEngine().load(
+                    outputDocument.toURI().toURL().
+                    toExternalForm());
+        } catch (IOException ex) {
+            Logger.getLogger(RewriteDocumentLocationHandler.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
     }
 
     private void updateMarkdown() {
@@ -170,7 +214,6 @@ public class MainWindowController implements Initializable {
                 MultiMarkdown.convert(currentDocument, outputDocument, Format.html);
 
                 try {
-                    prevScrollLoc = getVScrollValue(outputView);
                     outputView.getEngine().load(outputDocument.toURI().toURL().toExternalForm());
 
                 } catch (MalformedURLException ex) {
