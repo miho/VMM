@@ -9,26 +9,12 @@ task wrapper(type: Wrapper) {
 }
   
 dependencies {
+  
+  compile 'args4j:args4j:2.32'
+
   compile project("VMultiMarkdown")
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/']
-        }
-        
-        resources {
-            srcDirs = ['src/']
-        }
-    }
-
-    test {
-        java {
-            srcDirs = ['test/']
-        }
-    }
-}
 
 project.ext.set("mainClass", "eu.mihosoft.vrl.mmd.VMMConsole")
 
