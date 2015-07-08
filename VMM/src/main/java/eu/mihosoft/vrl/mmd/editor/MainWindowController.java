@@ -4,8 +4,6 @@
  */
 package eu.mihosoft.vrl.mmd.editor;
 
-import com.sun.javafx.geom.PickRay;
-import com.sun.javafx.scene.input.PickResultChooser;
 import eu.mihosoft.vrl.mmd.Format;
 import eu.mihosoft.vrl.mmd.IOUtil;
 import eu.mihosoft.vrl.mmd.MultiMarkdown;
@@ -18,24 +16,20 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -48,6 +42,9 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooserBuilder;
 import javafx.stage.Window;
+import org.reactfx.Change;
+import org.reactfx.EventStream;
+import org.reactfx.EventStreams;
 
 /**
  * FXML Controller class
@@ -82,6 +79,7 @@ public class MainWindowController implements Initializable {
 
     /**
      * Initializes the controller class.
+     *
      * @param url
      * @param rb
      */
@@ -132,8 +130,8 @@ public class MainWindowController implements Initializable {
                         scrollTo(outputView, 0, prevScrollLoc);
                     }
                 });
-        
-        outputView.setOnScrollFinished((evt)->{
+
+        outputView.setOnScrollFinished((evt) -> {
             prevScrollLoc = getVScrollValue(outputView);
         });
 
@@ -146,6 +144,14 @@ public class MainWindowController implements Initializable {
                 return null;
             }
         });
+
+        EventStream<Change<String>> textEvents
+                = EventStreams.changesOf(editor.textProperty());
+
+        textEvents.reduceSuccessions((a, b) -> b, Duration.ofMillis(500)).
+                subscribe(text -> {
+                    updatePreview();
+                });
     }
 
     private String replaceEndingOfFileNameFromMDToHTML(String fileName) {
@@ -165,12 +171,9 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    @FXML
-    public void onKeyTyped(KeyEvent evt) {
+    private void updatePreview() {
 
         try {
-            String output = editor.getText();
-
             String outputFilename
                     = replaceEndingOfFileNameFromMDToHTML(currentDocument.getName());
 
@@ -179,7 +182,7 @@ public class MainWindowController implements Initializable {
             File contentTmpLocation = IOUtil.createTempDir();
             File tmpOutputDocumentMD = new File(contentTmpLocation, "content.md");
             File tmpOutputDocumentHTML = new File(contentTmpLocation, "content.html");
-            
+
             saveTmpDocumentTo(tmpOutputDocumentMD);
 
             try {

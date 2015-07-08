@@ -36,6 +36,8 @@ dependencies {
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.3.0.1-SNAPSHOT', classifier: 'sources')
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.3.0.1-SNAPSHOT', classifier: 'javadoc')
 
+    compile group: 'org.reactfx', name: 'reactfx', version: '1.4.1'
+    
     compile project(":VMultiMarkdown")
 }
 
