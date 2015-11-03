@@ -75,7 +75,24 @@ public class MainWindowController implements Initializable {
 
     private int prevScrollLoc = 0;
 
-    private RewriteDocumentLocationHandler rewriteDocumentLocationHandler;
+    private static RewriteDocumentLocationHandler rewriteDocumentLocationHandler;
+
+    static {
+        rewriteDocumentLocationHandler = new RewriteDocumentLocationHandler();
+
+        try {
+            URL.setURLStreamHandlerFactory(protocol -> {
+                if (protocol.equals("file")) {
+                    return rewriteDocumentLocationHandler;
+                } else {
+                    return null;
+                }
+            });
+            rewriteDocumentLocationHandler = rewriteDocumentLocationHandler;
+        } catch (Exception ex) {
+
+        }
+    }
 
     /**
      * Initializes the controller class.
@@ -133,16 +150,6 @@ public class MainWindowController implements Initializable {
 
         outputView.setOnScrollFinished((evt) -> {
             prevScrollLoc = getVScrollValue(outputView);
-        });
-
-        rewriteDocumentLocationHandler = new RewriteDocumentLocationHandler();
-
-        URL.setURLStreamHandlerFactory(protocol -> {
-            if (protocol.equals("file")) {
-                return rewriteDocumentLocationHandler;
-            } else {
-                return null;
-            }
         });
 
         EventStream<Change<String>> textEvents
@@ -502,7 +509,7 @@ public class MainWindowController implements Initializable {
             ScrollEvent.VerticalTextScrollUnits _scrollTextYUnits, double _scrollTextY,
             double _x, double _y,
             double _screenX, double _screenY) {
-    //For 2.1.0 :
+        //For 2.1.0 :
         //final ScrollEvent scrollEvent = ScrollEvent.impl_scrollEvent(_scrollX, _scrollY, _scrollTextXUnits, _scrollTextX, _scrollTextYUnits, _scrollTextY, _x, _y, _screenX, _screenY, false, false, false, false);
         //For 2.2.0 :
         //Interpretation: EventType<ScrollEvent> eventType, double _scrollX, double _scrollY, double _totalScrollX, double _totalScrollY, HorizontalTextScrollUnits _scrollTextXUnits, double _scrollTextX, VerticalTextScrollUnits _scrollTextYUnits, double _scrollTextY, int _touchPoints, double _x, double _y, double _screenX, double _screenY, boolean _shiftDown, boolean _controlDown, boolean _altDown, boolean _metaDown, boolean _direct, boolean _inertia)
