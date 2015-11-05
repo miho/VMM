@@ -30,6 +30,9 @@ public class VMMPluginConfigurator extends VPluginConfigurator {
         // exported by using the exportPackage() method:
         //
         // exportPackage("com.your.package");
+        exportPackage("eu.mihosoft.vrl.mmd");
+        
+        
         // describe the plugin
         setDescription("MultiMarkdown Editor.");
 
